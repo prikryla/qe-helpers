@@ -27,7 +27,7 @@ python3 tmt_to_jira.py -r /path/to/repo -o test_cases.csv
 | Flag | Description | Default |
 |------|-------------|---------|
 | `-r`, `--root` | Root directory of an fmf tree (can be repeated) | *required* |
-| `-o`, `--output` | Output CSV file path | *required* |
+| `-o`, `--output` | Output CSV file path | `test_cases.csv` |
 | `-b`, `--branch` | Git branch used in Automation URLs | `master` |
 | `-t`, `--team` | AssignedTeam value for all exported tests | *empty* |
 

@@ -134,8 +134,8 @@ def main():
                         help="Git branch for Automation URLs (default: master)")
     parser.add_argument("-t", "--team", default="",
                         help="AssignedTeam value (default: empty)")
-    parser.add_argument("-o", "--output", required=True,
-                        help="Output CSV path")
+    parser.add_argument("-o", "--output", default="test_cases.csv",
+                        help="Output CSV path (default: test_cases.csv)")
     args = parser.parse_args()
 
     # Process each repo and merge all tests into one list
