@@ -66,6 +66,7 @@ The generated CSV contains the following columns:
 | Description | Test description from fmf metadata, or `No description` |
 | Components | Component name from the root `main.fmf` |
 | Tier | Test tier (1, 2, or 3) extracted from fmf metadata, or empty |
+| Assignee | Email extracted from the `contact` field in fmf metadata, or empty |
 | AssignedTeam | Value from `--team`, or empty |
 | Automation URL | Link to the `.fmf` file in the git repository |
 
