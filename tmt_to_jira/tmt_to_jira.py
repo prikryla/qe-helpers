@@ -99,6 +99,15 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
         summary = summary.replace(",", ";")
         description = description.replace(",", ";")
 
+        # Extract assignee email from 'contact' field (format: "Name <email>")
+        assignee = ""
+        contact = data.get("contact")
+        if contact:
+            if isinstance(contact, list):
+                contact = contact[0]
+            email_match = re.search(r"<([^>]+)>", str(contact))
+            assignee = email_match.group(1) if email_match else str(contact)
+
         # Extract tier: first from 'tier' attribute, then from tags (CI-Tier-1, Tier1, etc.)
         tier = ""
         tier_attr = data.get("tier")
@@ -119,6 +128,7 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
             "Description": description,
             "Components": component,
             "Tier": tier,
+            "Assignee": assignee,
             "AssignedTeam": team,
             "Automation URL": automation_url,
         })
@@ -151,7 +161,7 @@ def main():
         sys.exit("No fmf test definitions found.")
 
     # Write CSV output
-    fieldnames = ["Issue Type", "Summary", "Description", "Components", "Tier", "AssignedTeam", "Automation URL"]
+    fieldnames = ["Issue Type", "Summary", "Description", "Components", "Tier", "Assignee", "AssignedTeam", "Automation URL"]
     with open(args.output, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
