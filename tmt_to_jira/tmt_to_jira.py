@@ -123,7 +123,7 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
         automation_url = f"{repo_url}/{url_path}/{branch}/{rel_path}"
 
         tests.append({
-            "Issue Type": "Test",
+            "Issue Type": "Test Case",
             "Summary": summary,
             "Description": description,
             "Components": component,
