@@ -61,7 +61,7 @@ The generated CSV contains the following columns:
 
 | Column | Description |
 |--------|-------------|
-| Issue Type | Always `Test` |
+| Issue Type | Always `Test Case` |
 | Summary | `[component] /path/to/test` |
 | Description | Test description from fmf metadata, or `No description` |
 | Components | Component name from the root `main.fmf` |
