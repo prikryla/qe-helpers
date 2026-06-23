@@ -86,6 +86,8 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
         summary = summary.replace(",", ";")
         description = description.replace(",", ";")
 
+        tier = str(data.get("tier", "")) or ""
+
         automation_url = f"{repo_url}/{url_path}/{branch}/{rel_path}"
 
         tests.append({
@@ -93,6 +95,7 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
             "Summary": summary,
             "Description": description,
             "Components": component,
+            "Tier": tier,
             "AssignedTeam": team,
             "Automation URL": automation_url,
         })
@@ -123,7 +126,7 @@ def main():
     if not all_tests:
         sys.exit("No fmf test definitions found.")
 
-    fieldnames = ["Issue Type", "Summary", "Description", "Components", "AssignedTeam", "Automation URL"]
+    fieldnames = ["Issue Type", "Summary", "Description", "Components", "Tier", "AssignedTeam", "Automation URL"]
     with open(args.output, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
