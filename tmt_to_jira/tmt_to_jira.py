@@ -13,10 +13,12 @@ try:
 except ImportError:
     sys.exit("PyYAML is required: pip install pyyaml")
 
+# Directories to skip (tmt plans, not test cases)
 SKIP_DIRS = {"Plans", "plans"}
 
 
 def get_repo_info(root):
+    """Detect git remote URL and return (base_url, url_path) for GitHub/GitLab."""
     try:
         url = subprocess.check_output(
             ["git", "-C", str(root), "remote", "get-url", "origin"],
@@ -36,12 +38,16 @@ def get_repo_info(root):
 
 
 def load_fmf(path):
+    """Load and parse a single .fmf YAML file."""
     with open(path) as f:
         return yaml.safe_load(f) or {}
 
 
 def collect_tests(root, repo_url, url_path, branch, team=""):
+    """Walk all .fmf files in a repo and collect test case data."""
     root = Path(root)
+
+    # Read component name from the root main.fmf
     root_data = {}
     root_main = root / "main.fmf"
     if root_main.exists():
@@ -58,6 +64,7 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
     tests = []
 
     for fmf_file in sorted(root.rglob("*.fmf")):
+        # Skip root-level main.fmf and .fmf/ metadata directory
         if fmf_file.parent == root:
             continue
         if ".fmf" in fmf_file.parts:
@@ -67,6 +74,7 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
         if rel_path.parts[0] in SKIP_DIRS:
             continue
 
+        # Variant .fmf files inherit metadata from their parent main.fmf
         parent_data = {}
         if fmf_file.name != "main.fmf":
             parent_main = fmf_file.parent / "main.fmf"
@@ -76,17 +84,22 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
         file_data = load_fmf(fmf_file)
         data = {**parent_data, **file_data}
 
+        # Build test path: /Category/test-name or /Category/test-name/variant
         if fmf_file.name == "main.fmf":
             test_path = f"/{rel_path.parent}"
         else:
             test_path = f"/{rel_path.parent}/{fmf_file.stem}"
 
+        # Summary format: [component] /path/to/test
         summary = f"[{component}] {test_path}"
 
         description = " ".join(data.get("description", "").split()) or "No description"
+
+        # Sanitize commas to avoid breaking CSV columns
         summary = summary.replace(",", ";")
         description = description.replace(",", ";")
 
+        # Extract tier: first from 'tier' attribute, then from tags (CI-Tier-1, Tier1, etc.)
         tier = ""
         tier_attr = data.get("tier")
         if tier_attr is not None:
@@ -125,6 +138,7 @@ def main():
                         help="Output CSV path")
     args = parser.parse_args()
 
+    # Process each repo and merge all tests into one list
     all_tests = []
     for root_arg in args.roots:
         root = Path(root_arg).resolve()
@@ -136,6 +150,7 @@ def main():
     if not all_tests:
         sys.exit("No fmf test definitions found.")
 
+    # Write CSV output
     fieldnames = ["Issue Type", "Summary", "Description", "Components", "Tier", "AssignedTeam", "Automation URL"]
     with open(args.output, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
