@@ -3,6 +3,7 @@
 
 import argparse
 import csv
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -86,7 +87,16 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
         summary = summary.replace(",", ";")
         description = description.replace(",", ";")
 
-        tier = str(data.get("tier", "")) or ""
+        tier = ""
+        tier_attr = data.get("tier")
+        if tier_attr is not None:
+            tier = str(tier_attr)
+        else:
+            for tag in data.get("tag", []):
+                m = re.match(r"(?:CI-)?[Tt]ier-?(\d+)", str(tag))
+                if m:
+                    tier = m.group(1)
+                    break
 
         automation_url = f"{repo_url}/{url_path}/{branch}/{rel_path}"
 

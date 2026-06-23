@@ -65,6 +65,7 @@ The generated CSV contains the following columns:
 | Summary | `[component] /path/to/test` |
 | Description | Test description from fmf metadata, or `No description` |
 | Components | Component name from the root `main.fmf` |
+| Tier | Test tier (1, 2, or 3) extracted from fmf metadata, or empty |
 | AssignedTeam | Value from `--team`, or empty |
 | Automation URL | Link to the `.fmf` file in the git repository |
 
@@ -74,6 +75,10 @@ The generated CSV contains the following columns:
 - Walks all `*.fmf` files, skipping the `Plans/` directory
 - Variant `.fmf` files (non-`main.fmf`) inherit metadata from their parent `main.fmf`
 - Auto-detects GitHub and GitLab remotes to build Automation URLs
+- Extracts the test tier from multiple sources (in priority order):
+  1. `tier` attribute (e.g., `tier: '1'`)
+  2. Tags: `CI-Tier-1`, `CI-Tier-2`, `CI-Tier-3`
+  3. Tags: `Tier1`, `Tier2`, `Tier3` (including variants like `Tier1security`)
 - Commas in Summary and Description fields are replaced with semicolons
 - Newlines in descriptions are collapsed to single-line text
 
