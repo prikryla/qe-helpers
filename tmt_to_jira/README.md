@@ -79,9 +79,27 @@ The generated CSV contains the following columns:
 - Newlines in descriptions are collapsed to single-line text
 - Temporary clones are cleaned up automatically after scanning
 
-## Supported repositories
+## Supported platforms
 
-The script auto-detects the git hosting platform from the URL:
+The script auto-detects the git hosting platform from the HTTPS URL:
 
-- **GitHub** (`github.com`) — Automation URLs use `/blob/`
-- **GitLab** (`gitlab.*`) — Automation URLs use `/-/blob/`
+| Platform | URL pattern | Automation URL path |
+|----------|-------------|---------------------|
+| GitHub | `github.com` | `/blob/` |
+| GitLab | `gitlab.*` | `/-/blob/` |
+
+Other platforms (e.g. dist-git) will work for cloning and scanning but
+Automation URLs may be incorrect. To add a new platform, extend the
+`URL_PATH_RULES` dictionary in the script.
+
+## Error handling
+
+The script warns and continues when possible:
+
+- **Clone failure** — stops with an error (repo unreachable, auth issue, etc.)
+- **No `.fmf/` directory** — skips the repo with a warning
+- **No root `main.fmf`** — uses the repo directory name as component
+- **Malformed `.fmf` file** — skips the file with a warning
+- **Unknown platform** — warns that Automation URLs may be incorrect
+- **Non-HTTPS URL** — rejects with an error
+- **Output file write failure** — stops with an error
