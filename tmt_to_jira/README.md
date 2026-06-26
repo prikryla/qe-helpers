@@ -44,15 +44,9 @@ Multiple repositories with a team:
 ```bash
 python3 tmt_to_jira.py \
   -r https://github.com/RedHat-SP-Security/aide-tests \
-  -r git@gitlab.cee.redhat.com:special-projects/tests/aide.git \
+  -r https://gitlab.cee.redhat.com/special-projects/tests/aide.git \
   -t "rhel-security-special-projects" \
   -o test_cases.csv
-```
-
-SSH URLs work too:
-
-```bash
-python3 tmt_to_jira.py -r git@github.com:RedHat-SP-Security/aide-tests.git
 ```
 
 ## CSV Output

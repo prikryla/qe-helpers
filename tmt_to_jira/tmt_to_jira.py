@@ -19,23 +19,14 @@ SKIP_DIRS = {"Plans", "plans"}
 
 
 def parse_repo_url(url):
-    """Parse a git repo URL and return (base_url, url_path) for GitHub/GitLab."""
-    if url.startswith("git@github.com:"):
-        slug = url.removeprefix("git@github.com:").removesuffix(".git")
-        return f"https://github.com/{slug}", "blob"
-    if url.startswith("https://github.com/"):
-        slug = url.removeprefix("https://github.com/").removesuffix(".git").rstrip("/")
-        return f"https://github.com/{slug}", "blob"
+    """Parse a git repo HTTPS URL and return (base_url, url_path) for GitHub/GitLab."""
+    stripped = url.removeprefix("https://").removesuffix(".git").rstrip("/")
+    base = f"https://{stripped}"
+    if "github.com" in url:
+        return base, "blob"
     if "gitlab" in url:
-        if url.startswith("git@"):
-            host_slug = url.removeprefix("git@")
-            host, slug = host_slug.split(":", 1)
-            slug = slug.removesuffix(".git")
-            return f"https://{host}/{slug}", "-/blob"
-        if url.startswith("https://"):
-            stripped = url.removeprefix("https://").removesuffix(".git").rstrip("/")
-            return f"https://{stripped}", "-/blob"
-    return url.removesuffix(".git"), "blob"
+        return base, "-/blob"
+    return base, "blob"
 
 
 def clone_repo(url):
@@ -152,7 +143,7 @@ def collect_tests(root, repo_url, url_path, branch, team=""):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-r", "--repo", dest="repos", action="append", required=True,
-                        help="Git repo URL to clone and scan (can be repeated)")
+                        help="HTTPS repo URL to clone and scan (can be repeated)")
     parser.add_argument("-t", "--team", default="",
                         help="AssignedTeam value (default: empty)")
     parser.add_argument("-o", "--output", default="test_cases.csv",
